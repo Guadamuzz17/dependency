@@ -1,35 +1,20 @@
 pipeline {
     agent any
-
-    parameters {
-        string(name: 'BOM_FILE', defaultValue: 'target/bom.xml', description: 'Ruta al archivo BOM para el análisis de Dependency Track')
-        string(name: 'PROJECT_ID', defaultValue: 'your-project-id', description: 'ID del proyecto en Dependency Track')
-        string(name: 'REPORT_OUTPUT', defaultValue: 'informe_vulnerabilidades.pdf', description: 'Nombre del archivo de informe PDF generado por Pandoc')
-    }
-
     stages {
+        stage('Clonar repositorio') {
+            steps {
+                git 'https://github.com/Guadamuzz17/dependency.git'
+            }
+        }
+        stage('Instalar dependencias') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
         stage('Análisis de Vulnerabilidades con Dependency Track') {
             steps {
-                dependencyTrackPublisher artifact: "${params.BOM_FILE}", projectId: "${params.PROJECT_ID}"
+                 dependencyTrackPublisher artifact: '**/requirements.txt', projectId: '62141afc-37b9-4021-a425-8b0f9907ba8d'
             }
-        }
-
-        stage('Generar Informe con Pandoc') {
-            steps {
-                sh """
-                pandoc -o ${params.REPORT_OUTPUT} \
-                       -f markdown \
-                       --metadata title="Informe de Vulnerabilidades" \
-                       --metadata author="Tu Nombre" \
-                       resultados_vulnerabilidades.md
-                """
-            }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: "${params.REPORT_OUTPUT}", allowEmptyArchive: true
         }
     }
 }
