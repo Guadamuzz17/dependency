@@ -13,7 +13,8 @@ pipeline {
         }
         stage('Análisis de Vulnerabilidades con Dependency Track') {
             steps {
-                 dependencyTrackPublisher artifact: '**/requirements.txt', projectId: '62141afc-37b9-4021-a425-8b0f9907ba8d'
+                dependencyTrackPublisher artifact: 'requirements.txt', projectId: '62141afc-37b9-4021-a425-8b0f9907ba8d', synchronous: true
+
             }
         }
     }
